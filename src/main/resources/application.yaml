@@ -1,0 +1,72 @@
+## SPRING
+spring:
+  application:
+    name: ms-software-engineering
+  springdoc:
+    show-actuator: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mba-bank
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+      show-sql: true
+
+  flyway:
+    enabled: true
+
+  dev-tools:
+    restart:
+      enabled: false
+    add-properties: false
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  #jwt:
+  #  secret: ${jwt.secret}
+## SERVER
+server:
+  port: 8080
+  forward-headers-strategy: framework
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, restart, debug
+  endpoint:
+    health:
+      show-details: always
+    restart:
+      enabled: true
+  server:
+    port: 8081
+
+# SPRINGDOC
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    br:
+      com:
+        mills:
+          catalogo: DEBUG
+
+app:
+  starkbank:
+    private-key: ${-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIA+IvvfkdQ4f1i+NEhgKuX7pp3P9kea6oV7oK2gB3oZ6oAcGBSuBBAAK\noUQDQgAEEOVt8LbqURmse8VjgjpCdDW7LpKSg2C0ffaB6Y1kbolb6cOGrnpSyB9P\nBYRqj5G4lbWUrMwn/l6EbpSOoOy14A==\n-----END EC PRIVATE KEY-----\n:-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIA+IvvfkdQ4f1i+NEhgKuX7pp3P9kea6oV7oK2gB3oZ6oAcGBSuBBAAK\noUQDQgAEEOVt8LbqURmse8VjgjpCdDW7LpKSg2C0ffaB6Y1kbolb6cOGrnpSyB9P\nBYRqj5G4lbWUrMwn/l6EbpSOoOy14A==\n-----END EC PRIVATE KEY-----\n}
+    project-id: ${6247390637981696:6247390637981696}
+    env: ${STARKBANK_ENVIROMENT:sandbox}
