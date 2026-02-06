@@ -4,14 +4,13 @@ package br.com.software_engineering.application.controller;
 import br.com.software_engineering.application.domain.User;
 import br.com.software_engineering.application.dtos.request.UserDTO;
 import br.com.software_engineering.application.service.user.UserService;
-import br.com.software_engineering.infra.RestResponse;
+import br.com.software_engineering.infra.web.RestResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -29,9 +28,11 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<RestResponse<Page<User>>> get(
             @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phone,
             @RequestParam(defaultValue = "0") int page
     ){
-        return service.getAll(name, page);
+        return service.getAll(name, email, phone, page);
     }
 
     @PutMapping("/update/{id}")

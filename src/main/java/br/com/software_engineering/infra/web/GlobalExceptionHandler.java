@@ -1,4 +1,4 @@
-package br.com.software_engineering.infra;
+package br.com.software_engineering.infra.web;
 
 import br.com.software_engineering.application.enums.RestResponseStatus;
 import br.com.software_engineering.application.exceptions.valueObjectsExceptions.EmailValidationException;

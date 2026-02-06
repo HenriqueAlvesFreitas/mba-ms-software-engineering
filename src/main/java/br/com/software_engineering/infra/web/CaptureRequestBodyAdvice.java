@@ -1,4 +1,4 @@
-package br.com.software_engineering.infra;
+package br.com.software_engineering.infra.web;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.*;

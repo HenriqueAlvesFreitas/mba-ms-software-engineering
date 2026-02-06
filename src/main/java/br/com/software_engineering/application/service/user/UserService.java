@@ -6,10 +6,11 @@ import br.com.software_engineering.application.dtos.mappers.UserMapper;
 import br.com.software_engineering.application.dtos.request.UserDTO;
 import br.com.software_engineering.application.exceptions.userExceptions.UserAlreadyExistsException;
 import br.com.software_engineering.application.exceptions.userExceptions.UserNotFoundException;
-import br.com.software_engineering.application.repositories.UserRepository;
+import br.com.software_engineering.infra.persistence.UserRepository;
+import br.com.software_engineering.application.service.user.filter.UserSearchFilter;
 import br.com.software_engineering.application.service.user.strategy.UserSearchStrategy;
 import br.com.software_engineering.application.service.user.strategy.UserSearchStrategyResolver;
-import br.com.software_engineering.infra.RestResponse;
+import br.com.software_engineering.infra.web.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -41,12 +41,18 @@ public class UserService {
         return RestResponse.success(savedData, "User successfully saved!");
     }
 
-    public ResponseEntity<RestResponse<Page<User>>> getAll(String name, int page){
+    public ResponseEntity<RestResponse<Page<User>>> getAll(String name, String email, String phone, int page){
 
         Pageable pageable = PageRequest.of(Math.max(page, 0), 5);
-        UserSearchStrategy strategy = strategyResolver.resolve(name);
-        Page<User> userPage = strategy.search(name, pageable);
 
+        UserSearchFilter filter = new UserSearchFilter();
+        filter.setEmail(email);
+        filter.setName(name);
+        filter.setPhone(phone);
+
+        UserSearchStrategy strategy = strategyResolver.resolve(filter);
+
+        Page<User> userPage = strategy.search(filter, pageable);
 
         return RestResponse.success(userPage, "Users found!");
     }
