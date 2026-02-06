@@ -4,8 +4,10 @@ import br.com.software_engineering.application.domain.User;
 import br.com.software_engineering.application.domain.valueObjects.Email;
 import br.com.software_engineering.application.dtos.mappers.UserMapper;
 import br.com.software_engineering.application.dtos.request.UserDTO;
+import br.com.software_engineering.application.dtos.response.PageResponse;
 import br.com.software_engineering.application.exceptions.userExceptions.UserAlreadyExistsException;
 import br.com.software_engineering.application.exceptions.userExceptions.UserNotFoundException;
+import br.com.software_engineering.application.port.UserPort;
 import br.com.software_engineering.infra.persistence.UserRepository;
 import br.com.software_engineering.application.service.user.filter.UserSearchFilter;
 import br.com.software_engineering.application.service.user.strategy.UserSearchStrategy;
@@ -21,7 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class UserService implements UserPort {
 
     @Autowired
     UserRepository repository;
@@ -32,6 +34,7 @@ public class UserService {
     @Autowired
     UserMapper mapper;
 
+    @Override
     public ResponseEntity<RestResponse<User>> save(UserDTO dto){
 
         validateExistingEmail(new Email(dto.getEmail()));
@@ -41,7 +44,8 @@ public class UserService {
         return RestResponse.success(savedData, "User successfully saved!");
     }
 
-    public ResponseEntity<RestResponse<Page<User>>> getAll(String name, String email, String phone, int page){
+    @Override
+    public ResponseEntity<RestResponse<PageResponse<User>>> getAll(String name, String email, String phone, int page){
 
         Pageable pageable = PageRequest.of(Math.max(page, 0), 5);
 
@@ -52,11 +56,12 @@ public class UserService {
 
         UserSearchStrategy strategy = strategyResolver.resolve(filter);
 
-        Page<User> userPage = strategy.search(filter, pageable);
+        PageResponse<User> userPage = new PageResponse<>(strategy.search(filter, pageable));
 
         return RestResponse.success(userPage, "Users found!");
     }
 
+    @Override
     public ResponseEntity<RestResponse<User>> updateUser(UserDTO user, UUID id){
 
         User foundUser = findUser(id);
@@ -70,6 +75,7 @@ public class UserService {
         return RestResponse.success(savedUser, "User updated!");
     }
 
+    @Override
     public ResponseEntity<RestResponse<Object>> deleteUser(UUID id){
 
         User foundUser = findUser(id);
