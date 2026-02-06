@@ -1,4 +1,4 @@
-package br.com.software_engineering.application.service;
+package br.com.software_engineering.application.service.user;
 
 import br.com.software_engineering.application.domain.User;
 import br.com.software_engineering.application.domain.valueObjects.Email;
@@ -7,8 +7,13 @@ import br.com.software_engineering.application.dtos.request.UserDTO;
 import br.com.software_engineering.application.exceptions.userExceptions.UserAlreadyExistsException;
 import br.com.software_engineering.application.exceptions.userExceptions.UserNotFoundException;
 import br.com.software_engineering.application.repositories.UserRepository;
+import br.com.software_engineering.application.service.user.strategy.UserSearchStrategy;
+import br.com.software_engineering.application.service.user.strategy.UserSearchStrategyResolver;
 import br.com.software_engineering.infra.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +27,9 @@ public class UserService {
     UserRepository repository;
 
     @Autowired
+    UserSearchStrategyResolver strategyResolver;
+
+    @Autowired
     UserMapper mapper;
 
     public ResponseEntity<RestResponse<User>> save(UserDTO dto){
@@ -33,9 +41,14 @@ public class UserService {
         return RestResponse.success(savedData, "User successfully saved!");
     }
 
-    public ResponseEntity<RestResponse<List<User>>> getAll(){
+    public ResponseEntity<RestResponse<Page<User>>> getAll(String name, int page){
 
-        return RestResponse.success(repository.findAll(), "Users found!");
+        Pageable pageable = PageRequest.of(Math.max(page, 0), 5);
+        UserSearchStrategy strategy = strategyResolver.resolve(name);
+        Page<User> userPage = strategy.search(name, pageable);
+
+
+        return RestResponse.success(userPage, "Users found!");
     }
 
     public ResponseEntity<RestResponse<User>> updateUser(UserDTO user, UUID id){
@@ -49,6 +62,15 @@ public class UserService {
         User savedUser = repository.save(foundUser);
 
         return RestResponse.success(savedUser, "User updated!");
+    }
+
+    public ResponseEntity<RestResponse<Object>> deleteUser(UUID id){
+
+        User foundUser = findUser(id);
+
+        repository.delete(foundUser);
+
+        return RestResponse.success(null, "User Deleted!");
     }
 
     private User findUser(UUID id){
